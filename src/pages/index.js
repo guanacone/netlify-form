@@ -1,3 +1,4 @@
+import { Link } from 'gatsby';
 import React from 'react';
 
 const Home = () => (
@@ -5,6 +6,7 @@ const Home = () => (
     <h1>Gatsby boilerplate</h1>
     <h2>Gatsby boilerplate</h2>
     <h3>Gatsby boilerplate</h3>
+    <Link to='/contact'>Contact Us!</Link>
   </div>
 );
 
