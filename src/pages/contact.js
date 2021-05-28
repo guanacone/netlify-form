@@ -1,23 +1,22 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { navigate } from 'gatsby';
 
-const ContactForm = () => {
-  const [state, setState] = useState({});
+const encode = (data) => {
+  return Object.keys(data)
+    .map((key) => `${encodeURIComponent(key)}=${encodeURIComponent(data[key])}`)
+    .join('&');
+};
+
+const Contact = () => {
+  const [state, setState] = React.useState({});
 
   const handleChange = (e) => {
     setState({ ...state, [e.target.name]: e.target.value });
   };
 
-  const encode = (data) => {
-    return Object.keys(data)
-      .map((key) => `${encodeURIComponent(key)}=${encodeURIComponent(data[key])}`)
-      .join('&');
-  };
-
   const handleSubmit = (e) => {
     e.preventDefault();
     const form = e.target;
-
     fetch('/', {
       method: 'POST',
       headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
@@ -32,51 +31,47 @@ const ContactForm = () => {
 
   return (
     <>
-      <h1>Contact Form</h1>
+      <h1>Contact</h1>
       <form
-        name='contact-us'
-        method='POST'
-        action='/thank-you'
+        name='contact'
+        method='post'
+        action='/thanks/'
+        data-netlify='true'
+        data-netlify-honeypot='bot-field'
         onSubmit={handleSubmit}
       >
-        <noscript>
-          <p>This form won’t work with Javascript disabled</p>
-        </noscript>
-        <div>
-          <input
-            type='text'
-            id='text-input'
-            name='name'
-            onChange={handleChange}
-            required
-          />
-          <label htmlFor='text-input'>Name / Alias</label>
-        </div>
-        <div>
-          <input
-            id='email-input'
-            type='email'
-            name='email'
-            placeholder=''
-            onChange={handleChange}
-            required
-          />
-          <label htmlFor='email-input'>Email</label>
-        </div>
-        <div>
-          <textarea
-            id='textarea'
-            type='text'
-            name='message'
-            onChange={handleChange}
-            required
-          />
-          <label htmlFor='textarea'>Message</label>
-        </div>
-        <button type='submit'>Submit</button>
+        <p hidden>
+          <label>
+            Don’t fill this out: <input name='bot-field' onChange={handleChange} />
+          </label>
+        </p>
+        <p>
+          <label>
+            Your name:
+            <br />
+            <input type='text' name='name' onChange={handleChange} />
+          </label>
+        </p>
+        <p>
+          <label>
+            Your email:
+            <br />
+            <input type='email' name='email' onChange={handleChange} />
+          </label>
+        </p>
+        <p>
+          <label>
+            Message:
+            <br />
+            <textarea name='message' onChange={handleChange} />
+          </label>
+        </p>
+        <p>
+          <button type='submit'>Send</button>
+        </p>
       </form>
     </>
   );
 };
 
-export default ContactForm;
+export default Contact;
