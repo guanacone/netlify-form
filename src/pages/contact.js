@@ -33,7 +33,7 @@ const Contact = () => {
     <>
       <h1>Contact</h1>
       <form
-        name='contact'
+        name='contact-form'
         method='post'
         action='/thanks/'
         data-netlify='true'
