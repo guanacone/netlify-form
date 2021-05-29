@@ -7,7 +7,7 @@
 module.exports = {
   /* Your site config here */
   plugins: [
-    'gatsby-plugin-layout',
+    // 'gatsby-plugin-layout',
     'gatsby-plugin-styled-components',
     {
       resolve: 'gatsby-plugin-google-fonts',
