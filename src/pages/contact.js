@@ -1,14 +1,19 @@
-import React from 'react';
+import React, { createRef, useState } from 'react';
 import { navigate } from 'gatsby';
+import Recaptcha from 'react-google-recaptcha';
 
-const encode = (data) => {
-  return Object.keys(data)
-    .map((key) => `${encodeURIComponent(key)}=${encodeURIComponent(data[key])}`)
-    .join('&');
-};
+const RECAPTCHA_KEY = '6LcbRfwaAAAAAO7Fehsctpq4rLUlid0i_x8ygHdt';
 
-const Contact = () => {
-  const [state, setState] = React.useState({});
+const ContactForm = () => {
+  const [state, setState] = useState({});
+  const recaptchaRef = createRef();
+  const [buttonDisabled, setButtonDisabled] = useState(true);
+
+  const encode = (data) => {
+    return Object.keys(data)
+      .map((key) => `${encodeURIComponent(key)}=${encodeURIComponent(data[key])}`)
+      .join('&');
+  };
 
   const handleChange = (e) => {
     setState({ ...state, [e.target.name]: e.target.value });
@@ -17,11 +22,14 @@ const Contact = () => {
   const handleSubmit = (e) => {
     e.preventDefault();
     const form = e.target;
+    const recaptchaValue = recaptchaRef.current.getValue();
+
     fetch('/', {
       method: 'POST',
       headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
       body: encode({
         'form-name': form.getAttribute('name'),
+        'g-recaptcha-response': recaptchaValue,
         ...state,
       }),
     })
@@ -30,48 +38,59 @@ const Contact = () => {
   };
 
   return (
-    <>
-      <h1>Contact</h1>
-      <form
-        name='contact-form'
-        method='post'
-        action='/thanks/'
-        data-netlify='true'
-        data-netlify-honeypot='bot-field'
-        onSubmit={handleSubmit}
-      >
-        <p hidden>
-          <label>
-            Don’t fill this out: <input name='bot-field' onChange={handleChange} />
-          </label>
-        </p>
-        <p>
-          <label>
-            Your name:
-            <br />
-            <input type='text' name='name' onChange={handleChange} />
-          </label>
-        </p>
-        <p>
-          <label>
-            Your email:
-            <br />
-            <input type='email' name='email' onChange={handleChange} />
-          </label>
-        </p>
-        <p>
-          <label>
-            Message:
-            <br />
-            <textarea name='message' onChange={handleChange} />
-          </label>
-        </p>
-        <p>
-          <button type='submit'>Send</button>
-        </p>
-      </form>
-    </>
+    <form
+      name='contact-us'
+      method='POST'
+      data-netlify='true'
+      data-netlify-recaptcha='true'
+      action='/thank-you'
+      onSubmit={handleSubmit}
+    >
+      <noscript>
+        <p>This form won’t work with Javascript disabled</p>
+      </noscript>
+      <div>
+        <input
+          type='text'
+          id='text-input'
+          name='name'
+          onChange={handleChange}
+          required
+        />
+        <label htmlFor='text-input'>Name / Alias</label>
+      </div>
+      <div>
+        <input
+          id='email-input'
+          type='email'
+          name='email'
+          placeholder=''
+          onChange={handleChange}
+          required
+        />
+        <label htmlFor='email-input'>Email</label>
+      </div>
+      <div>
+        <textarea
+          id='textarea'
+          type='text'
+          name='message'
+          onChange={handleChange}
+          required
+        />
+        <label htmlFor='textarea'>Message</label>
+      </div>
+      {/* Recaptcha */}
+      <Recaptcha
+        ref={recaptchaRef}
+        sitekey={RECAPTCHA_KEY}
+        size='normal'
+        id='recaptcha-google'
+        onChange={() => setButtonDisabled(false)}
+      />
+      <button type='submit' disabled={buttonDisabled}>Submit</button>
+    </form>
   );
 };
 
-export default Contact;
+export default ContactForm;
